@@ -7,6 +7,30 @@ from ..models.internship import Internship
 router = APIRouter()
 
 
+# Get all internships
+@router.get("/internships")
+def get_all_internships(
+    db: Session = Depends(get_db)
+):
+    internships = db.query(Internship).all()
+
+    return [
+        {
+            "internship_id": internship.internship_id,
+            "company_id": internship.company_id,
+            "admin_id": internship.admin_id,
+            "title": internship.title,
+            "description": internship.description,
+            "location": internship.location,
+            "stipend": internship.stipend,
+            "duration": internship.duration,
+            "last_date": str(internship.last_date)
+        }
+        for internship in internships
+    ]
+
+
+# Create internship
 @router.post("/internships")
 def create_internship(
     company_id: int,
@@ -38,6 +62,9 @@ def create_internship(
         "message": "Internship created successfully",
         "internship_id": internship.internship_id
     }
+
+
+# Get one internship
 @router.get("/internships/{internship_id}")
 def get_internship(
     internship_id: int,
@@ -63,6 +90,9 @@ def get_internship(
         "duration": internship.duration,
         "last_date": str(internship.last_date)
     }
+
+
+# Update internship
 @router.put("/internships/{internship_id}")
 def update_internship(
     internship_id: int,
@@ -101,6 +131,9 @@ def update_internship(
         "message": "Internship updated successfully",
         "internship_id": internship.internship_id
     }
+
+
+# Delete internship
 @router.delete("/internships/{internship_id}")
 def delete_internship(
     internship_id: int,
