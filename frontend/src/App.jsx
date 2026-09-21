@@ -2260,62 +2260,104 @@ function App() {
 
             setLoginError("");
 
-            if (role !== "student") {
-              setLoggedIn(true);
-              setPage("dashboard");
-              return;
-            }
-
-            if (!email || !password) {
+            if (!email.trim() || !password) {
               setLoginError(
                 "Please enter email and password"
               );
               return;
             }
 
-            try {
+            // ADMIN LOGIN
+            if (role === "admin") {
 
-              const response =
-                await fetch(
+              if (
+                email.trim() === "admin@gmail.com" &&
+                password === "admin123"
+              ) {
+                setLoggedIn(true);
+                setPage("dashboard");
+                setLoginError("");
+              } else {
+                setLoginError(
+                  "Invalid admin email or password"
+                );
+              }
+
+              return;
+            }
+
+            // COMPANY LOGIN
+            if (role === "company") {
+
+              if (
+                email.trim() === "company@gmail.com" &&
+                password === "company123"
+              ) {
+                setLoggedIn(true);
+                setPage("dashboard");
+                setLoginError("");
+              } else {
+                setLoginError(
+                  "Invalid company email or password"
+                );
+              }
+
+              return;
+            }
+
+            // STUDENT LOGIN
+            if (role === "student") {
+
+              try {
+
+                const response = await fetch(
                   API_URL + "/students/login",
                   {
                     method: "POST",
-
                     headers: {
-                      "Content-Type":
-                        "application/json",
+                      "Content-Type": "application/json",
                     },
-
                     body: JSON.stringify({
-                      email: email,
+                      email: email.trim(),
                       password: password,
                     }),
                   }
                 );
 
-              if (response.ok) {
+                let data = {};
 
-                setLoggedIn(true);
-                setPage("dashboard");
-                setLoginError("");
+                try {
+                  data = await response.json();
+                } catch (error) {
+                  data = {};
+                }
 
-              } else {
+                if (response.ok) {
+
+                  setLoggedIn(true);
+                  setPage("dashboard");
+                  setLoginError("");
+
+                } else {
+
+                  setLoginError(
+                    data.detail ||
+                    data.message ||
+                    "Invalid student email or password"
+                  );
+                }
+
+              } catch (error) {
+
+                console.error(
+                  "Student login connection error:",
+                  error
+                );
 
                 setLoginError(
-                  "Invalid email or password"
+                  "Cannot connect to backend"
                 );
               }
-
-            } catch (error) {
-
-              console.error(
-                "Backend connection error:",
-                error
-              );
-
-              setLoginError(
-                "Cannot connect to backend"
-              );
             }
           }}
         >
