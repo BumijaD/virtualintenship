@@ -13,24 +13,31 @@ from app.routes.internship_routes import router as internship_router
 from app.routes.application_routes import router as application_router
 from app.routes.admin_routes import router as admin_router
 from app.routes.admin_activity_routes import router as admin_activity_router
+
+
 Base.metadata.create_all(bind=engine)
 
+
 app = FastAPI()
+
+
+# =====================================================
+# CORS CONFIGURATION
+# =====================================================
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5175",
-        "http://127.0.0.1:5175",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-        "https://YOUR-EXACT-VERCEL-DOMAIN.vercel.app",
-    ],
+    allow_origins=["*"],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# =====================================================
+# ROUTERS
+# =====================================================
+
 app.include_router(student_router)
 app.include_router(company_router)
 app.include_router(internship_router)
@@ -39,13 +46,20 @@ app.include_router(admin_router)
 app.include_router(admin_activity_router)
 
 
-@app.get("/")
+# =====================================================
+# HOME
+# =====================================================
 
+@app.get("/")
 def home():
     return {
         "message": "Virtual Internship Platform Backend is Running"
     }
 
+
+# =====================================================
+# DATABASE TEST
+# =====================================================
 
 @app.get("/test-db")
 def test_database():
