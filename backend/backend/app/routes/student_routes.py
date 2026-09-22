@@ -19,6 +19,16 @@ class StudentLogin(BaseModel):
 
 
 # =====================================================
+# STUDENT REGISTER REQUEST
+# =====================================================
+
+class StudentRegister(BaseModel):
+    name: str
+    email: str
+    password: str
+
+
+# =====================================================
 # CREATE STUDENT
 # =====================================================
 
@@ -67,6 +77,57 @@ def create_student(
 
         return {
             "message": "Email already exists"
+        }
+
+
+# =====================================================
+# STUDENT REGISTER
+# =====================================================
+
+@router.post("/students/register")
+def student_register(
+    register_data: StudentRegister,
+    db: Session = Depends(get_db)
+):
+    # Check if email already exists
+    existing_student = (
+        db.query(Student)
+        .filter(Student.email == register_data.email)
+        .first()
+    )
+
+    if existing_student:
+        return {
+            "message": "Email already registered"
+        }
+
+    # Create new student
+    student = Student(
+        name=register_data.name,
+        email=register_data.email,
+        password=register_data.password,
+        phone="",
+        department="",
+        cgpa=0
+    )
+
+    try:
+        db.add(student)
+        db.commit()
+        db.refresh(student)
+
+        return {
+            "message": "Registration successful",
+            "student_id": student.student_id,
+            "name": student.name,
+            "email": student.email
+        }
+
+    except IntegrityError:
+        db.rollback()
+
+        return {
+            "message": "Email already registered"
         }
 
 
