@@ -27,6 +27,24 @@ function App() {
   const studentId = 33;
 
   // =====================================================
+  // LOGOUT
+  // =====================================================
+
+  const logout = () => {
+    setLoggedIn(false);
+    setPage("dashboard");
+    setEmail("");
+    setPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setShowPassword(false);
+    setLoginError("");
+    setApplicationMessage("");
+    setCompanyApplicationMessage("");
+    setSelectedInternship(null);
+  };
+
+  // =====================================================
   // INTERNSHIPS
   // =====================================================
 
@@ -312,10 +330,7 @@ function App() {
           <h1>Virtual Internship Platform</h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -434,10 +449,7 @@ function App() {
           <h1>Virtual Internship Platform</h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -514,10 +526,7 @@ function App() {
           <h1>Virtual Internship Platform</h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -583,10 +592,7 @@ function App() {
           <h1>Virtual Internship Platform</h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -661,10 +667,7 @@ function App() {
           <h1>Virtual Internship Platform</h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -749,10 +752,7 @@ function App() {
           <h1>Virtual Internship Platform</h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -833,10 +833,7 @@ function App() {
           <h1>Virtual Internship Platform</h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -1027,10 +1024,7 @@ function App() {
           <h1>Virtual Internship Platform</h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -1205,10 +1199,7 @@ function App() {
           <h1>Virtual Internship Platform</h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -1296,10 +1287,7 @@ function App() {
           </h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -1396,10 +1384,7 @@ function App() {
           </h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -1508,10 +1493,7 @@ function App() {
           </h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -1598,10 +1580,7 @@ function App() {
           </h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -1742,10 +1721,7 @@ function App() {
           </h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -1850,12 +1826,7 @@ function App() {
           </h1>
 
           <button
-            onClick={() => {
-              setLoggedIn(false);
-              setPage("dashboard");
-              setEmail("");
-              setPassword("");
-            }}
+            onClick={logout}
           >
             Logout
           </button>
@@ -2125,6 +2096,8 @@ function App() {
               setRole("student");
               setLoggedIn(false);
               setPage("dashboard");
+              setEmail("");
+              setPassword("");
               setShowPassword(false);
               setLoginError("");
             }}
@@ -2142,6 +2115,8 @@ function App() {
               setRole("company");
               setLoggedIn(false);
               setPage("dashboard");
+              setEmail("");
+              setPassword("");
               setShowPassword(false);
               setLoginError("");
             }}
@@ -2159,6 +2134,8 @@ function App() {
               setRole("admin");
               setLoggedIn(false);
               setPage("dashboard");
+              setEmail("");
+              setPassword("");
               setShowPassword(false);
               setLoginError("");
             }}
