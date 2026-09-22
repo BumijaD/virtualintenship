@@ -700,3 +700,44 @@ main > h1 {
 .edit-profile-button:hover {
   background: #1d4ed8;
 }
+/* FINAL LOGIN CENTERING */
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app {
+  width: 100% !important;
+  min-height: 100vh !important;
+
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+
+  margin: 0 !important;
+  padding: 20px !important;
+
+  box-sizing: border-box !important;
+}
+
+.login-box {
+  width: 580px !important;
+  max-width: calc(100vw - 40px) !important;
+
+  margin: 0 auto !important;
+
+  box-sizing: border-box !important;
+}
