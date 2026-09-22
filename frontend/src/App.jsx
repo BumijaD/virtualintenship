@@ -21,10 +21,18 @@ function App() {
     useState("");
 
   // =====================================================
-  // STUDENT ID
+  // STUDENT ACCOUNT / SIGNUP
   // =====================================================
 
-  const studentId = 33;
+  const [studentId, setStudentId] = useState(null);
+
+  const [signupName, setSignupName] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
+  const [signupError, setSignupError] = useState("");
+  const [signupLoading, setSignupLoading] = useState(false);
+  const [registrationMessage, setRegistrationMessage] = useState("");
 
   // =====================================================
   // LOGOUT
@@ -39,6 +47,14 @@ function App() {
     setConfirmPassword("");
     setShowPassword(false);
     setLoginError("");
+    setRegistrationMessage("");
+    setSignupName("");
+    setSignupEmail("");
+    setSignupPassword("");
+    setSignupConfirmPassword("");
+    setSignupError("");
+    setSignupLoading(false);
+    setStudentId(null);
     setApplicationMessage("");
     setCompanyApplicationMessage("");
     setSelectedInternship(null);
@@ -1912,6 +1928,190 @@ function App() {
   }
 
   // =====================================================
+  // STUDENT SIGNUP PAGE
+  // =====================================================
+
+  if (!loggedIn && role === "student" && page === "signup") {
+    return (
+      <div className="app">
+        <div className="login-box">
+          <h1>Virtual Internship Platform</h1>
+
+          <h2>Student Sign Up</h2>
+
+          <input
+            type="text"
+            placeholder="Enter Full Name"
+            value={signupName}
+            onChange={(e) => {
+              setSignupName(e.target.value);
+              setSignupError("");
+            }}
+          />
+
+          <input
+            type="email"
+            placeholder="Enter Email"
+            value={signupEmail}
+            onChange={(e) => {
+              setSignupEmail(e.target.value);
+              setSignupError("");
+            }}
+          />
+
+          <input
+            type="password"
+            placeholder="Enter Password"
+            value={signupPassword}
+            onChange={(e) => {
+              setSignupPassword(e.target.value);
+              setSignupError("");
+            }}
+          />
+
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            value={signupConfirmPassword}
+            onChange={(e) => {
+              setSignupConfirmPassword(e.target.value);
+              setSignupError("");
+            }}
+          />
+
+          <button
+            type="button"
+            className="login-button"
+            disabled={signupLoading}
+            onClick={async () => {
+              setSignupError("");
+
+              const name = signupName.trim();
+              const newEmail = signupEmail.trim();
+              const newPassword = signupPassword;
+              const confirmPasswordValue = signupConfirmPassword;
+
+              if (!name || !newEmail || !newPassword || !confirmPasswordValue) {
+                setSignupError("Please fill all fields");
+                return;
+              }
+
+              if (!newEmail.includes("@")) {
+                setSignupError("Please enter a valid email");
+                return;
+              }
+
+              if (newPassword !== confirmPasswordValue) {
+                setSignupError("Passwords do not match");
+                return;
+              }
+
+              setSignupLoading(true);
+
+              try {
+                const response = await fetch(
+                  API_URL + "/students/register",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Accept: "application/json",
+                    },
+                    body: JSON.stringify({
+                      name: name,
+                      email: newEmail,
+                      password: newPassword,
+                    }),
+                  }
+                );
+
+                let data = {};
+
+                try {
+                  data = await response.json();
+                } catch (error) {
+                  data = {};
+                }
+
+                if (
+                  response.ok &&
+                  data.student_id &&
+                  (
+                    data.message === "Registration successful" ||
+                    data.message === "Student registered successfully"
+                  )
+                ) {
+                  setEmail(newEmail);
+                  setPassword("");
+                  setSignupName("");
+                  setSignupEmail("");
+                  setSignupPassword("");
+                  setSignupConfirmPassword("");
+                  setSignupError("");
+                  setRegistrationMessage(
+                    "Registration successful! Please login with your email and password."
+                  );
+                  setPage("dashboard");
+                } else {
+                  setSignupError(
+                    data.detail ||
+                      data.message ||
+                      "Registration failed"
+                  );
+                }
+              } catch (error) {
+                console.error(
+                  "Student registration connection error:",
+                  error
+                );
+                setSignupError("Cannot connect to backend");
+              } finally {
+                setSignupLoading(false);
+              }
+            }}
+          >
+            {signupLoading ? "Signing Up..." : "Sign Up"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setPage("dashboard");
+              setSignupError("");
+              setSignupName("");
+              setSignupEmail("");
+              setSignupPassword("");
+              setSignupConfirmPassword("");
+            }}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#244394",
+              cursor: "pointer",
+              marginTop: "10px",
+              fontWeight: "bold",
+            }}
+          >
+            ← Back to Student Login
+          </button>
+
+          {signupError && (
+            <p
+              style={{
+                color: "red",
+                marginTop: "12px",
+                fontWeight: "bold",
+              }}
+            >
+              {signupError}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // =====================================================
   // FORGOT PASSWORD PAGE
   // =====================================================
 
@@ -2100,6 +2300,8 @@ function App() {
               setPassword("");
               setShowPassword(false);
               setLoginError("");
+              setRegistrationMessage("");
+              setStudentId(null);
             }}
           >
             Student
@@ -2119,6 +2321,8 @@ function App() {
               setPassword("");
               setShowPassword(false);
               setLoginError("");
+              setRegistrationMessage("");
+              setStudentId(null);
             }}
           >
             Company
@@ -2138,6 +2342,8 @@ function App() {
               setPassword("");
               setShowPassword(false);
               setLoginError("");
+              setRegistrationMessage("");
+              setStudentId(null);
             }}
           >
             Admin
@@ -2214,6 +2420,7 @@ function App() {
           onClick={() => {
             setPage("forgot-password");
             setLoginError("");
+            setRegistrationMessage("");
             setNewPassword("");
             setConfirmPassword("");
           }}
@@ -2230,6 +2437,34 @@ function App() {
         >
           Forgot Password?
         </button>
+
+        {role === "student" && (
+          <button
+            type="button"
+            onClick={() => {
+              setPage("signup");
+              setLoginError("");
+              setRegistrationMessage("");
+              setSignupName("");
+              setSignupEmail("");
+              setSignupPassword("");
+              setSignupConfirmPassword("");
+              setSignupError("");
+            }}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#244394",
+              cursor: "pointer",
+              marginTop: "5px",
+              marginBottom: "15px",
+              fontWeight: "bold",
+              fontSize: "15px",
+            }}
+          >
+            New Student? Sign Up
+          </button>
+        )}
 
         <button
           className="login-button"
@@ -2309,14 +2544,17 @@ function App() {
                   data = {};
                 }
 
-                if (response.ok) {
-
+                if (
+                  response.ok &&
+                  data.message === "Login successful" &&
+                  data.student_id
+                ) {
+                  setStudentId(data.student_id);
                   setLoggedIn(true);
                   setPage("dashboard");
                   setLoginError("");
-
+                  setRegistrationMessage("");
                 } else {
-
                   setLoginError(
                     data.detail ||
                     data.message ||
@@ -2340,6 +2578,18 @@ function App() {
         >
           Login
         </button>
+
+        {registrationMessage && role === "student" && (
+          <p
+            style={{
+              color: "green",
+              marginTop: "12px",
+              fontWeight: "bold",
+            }}
+          >
+            {registrationMessage}
+          </p>
+        )}
 
         {loginError && (
           <p
