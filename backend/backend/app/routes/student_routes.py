@@ -29,6 +29,15 @@ class StudentRegister(BaseModel):
 
 
 # =====================================================
+# STUDENT FORGOT PASSWORD REQUEST
+# =====================================================
+
+class StudentForgotPassword(BaseModel):
+    email: str
+    new_password: str
+
+
+# =====================================================
 # CREATE STUDENT
 # =====================================================
 
@@ -89,7 +98,6 @@ def student_register(
     register_data: StudentRegister,
     db: Session = Depends(get_db)
 ):
-    # Check if email already exists
     existing_student = (
         db.query(Student)
         .filter(Student.email == register_data.email)
@@ -101,7 +109,6 @@ def student_register(
             "message": "Email already registered"
         }
 
-    # Create new student
     student = Student(
         name=register_data.name,
         email=register_data.email,
@@ -161,6 +168,36 @@ def student_login(
         "student_id": student.student_id,
         "name": student.name,
         "email": student.email
+    }
+
+
+# =====================================================
+# STUDENT FORGOT PASSWORD
+# =====================================================
+
+@router.post("/students/forgot-password")
+def student_forgot_password(
+    forgot_data: StudentForgotPassword,
+    db: Session = Depends(get_db)
+):
+    student = (
+        db.query(Student)
+        .filter(Student.email == forgot_data.email)
+        .first()
+    )
+
+    if student is None:
+        return {
+            "message": "Email not found"
+        }
+
+    student.password = forgot_data.new_password
+
+    db.commit()
+    db.refresh(student)
+
+    return {
+        "message": "Password reset successfully"
     }
 
 

@@ -25,6 +25,8 @@ function App() {
   // =====================================================
 
   const [studentId, setStudentId] = useState(null);
+  const [companyId, setCompanyId] = useState(null);
+  const [companyName, setCompanyName] = useState("");
 
   const [signupName, setSignupName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
@@ -33,6 +35,14 @@ function App() {
   const [signupError, setSignupError] = useState("");
   const [signupLoading, setSignupLoading] = useState(false);
   const [registrationMessage, setRegistrationMessage] = useState("");
+
+  // COMPANY ACCOUNT / SIGNUP
+  const [companySignupName, setCompanySignupName] = useState("");
+  const [companySignupEmail, setCompanySignupEmail] = useState("");
+  const [companySignupPassword, setCompanySignupPassword] = useState("");
+  const [companySignupConfirmPassword, setCompanySignupConfirmPassword] = useState("");
+  const [companySignupError, setCompanySignupError] = useState("");
+  const [companySignupLoading, setCompanySignupLoading] = useState(false);
 
   // =====================================================
   // LOGOUT
@@ -54,7 +64,15 @@ function App() {
     setSignupConfirmPassword("");
     setSignupError("");
     setSignupLoading(false);
+    setCompanySignupName("");
+    setCompanySignupEmail("");
+    setCompanySignupPassword("");
+    setCompanySignupConfirmPassword("");
+    setCompanySignupError("");
+    setCompanySignupLoading(false);
     setStudentId(null);
+    setCompanyId(null);
+    setCompanyName("");
     setApplicationMessage("");
     setCompanyApplicationMessage("");
     setSelectedInternship(null);
@@ -896,7 +914,7 @@ function App() {
 
               try {
                 const query = new URLSearchParams({
-                  company_id: "1",
+                  company_id: String(companyId || 1),
                   admin_id: "1",
                   title: String(title),
                   description: String(description),
@@ -1313,7 +1331,7 @@ function App() {
         <div className="dashboard-content">
 
           <h2>
-            Welcome, Company 🏢
+            Welcome, {companyName || "Company"} 🏢
           </h2>
 
           <p>
@@ -2112,6 +2130,183 @@ function App() {
   }
 
   // =====================================================
+  // COMPANY SIGNUP PAGE
+  // =====================================================
+
+  if (!loggedIn && role === "company" && page === "company-signup") {
+    return (
+      <div className="app">
+        <div className="login-box">
+          <h1>Virtual Internship Platform</h1>
+
+          <h2>Company Sign Up</h2>
+
+          <input
+            type="text"
+            placeholder="Enter Company Name"
+            value={companySignupName}
+            onChange={(e) => {
+              setCompanySignupName(e.target.value);
+              setCompanySignupError("");
+            }}
+          />
+
+          <input
+            type="email"
+            placeholder="Enter Email"
+            value={companySignupEmail}
+            onChange={(e) => {
+              setCompanySignupEmail(e.target.value);
+              setCompanySignupError("");
+            }}
+          />
+
+          <input
+            type="password"
+            placeholder="Enter Password"
+            value={companySignupPassword}
+            onChange={(e) => {
+              setCompanySignupPassword(e.target.value);
+              setCompanySignupError("");
+            }}
+          />
+
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            value={companySignupConfirmPassword}
+            onChange={(e) => {
+              setCompanySignupConfirmPassword(e.target.value);
+              setCompanySignupError("");
+            }}
+          />
+
+          <button
+            type="button"
+            className="login-button"
+            disabled={companySignupLoading}
+            onClick={async () => {
+              setCompanySignupError("");
+
+              const name = companySignupName.trim();
+              const newEmail = companySignupEmail.trim();
+              const newPassword = companySignupPassword;
+              const confirmPasswordValue = companySignupConfirmPassword;
+
+              if (!name || !newEmail || !newPassword || !confirmPasswordValue) {
+                setCompanySignupError("Please fill all fields");
+                return;
+              }
+
+              if (!newEmail.includes("@")) {
+                setCompanySignupError("Please enter a valid email");
+                return;
+              }
+
+              if (newPassword !== confirmPasswordValue) {
+                setCompanySignupError("Passwords do not match");
+                return;
+              }
+
+              setCompanySignupLoading(true);
+
+              try {
+                const response = await fetch(
+                  API_URL + "/companies/register",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Accept: "application/json",
+                    },
+                    body: JSON.stringify({
+                      company_name: name,
+                      email: newEmail,
+                      password: newPassword,
+                    }),
+                  }
+                );
+
+                let data = {};
+                try {
+                  data = await response.json();
+                } catch (error) {
+                  data = {};
+                }
+
+                if (
+                  response.ok &&
+                  data.company_id &&
+                  data.message === "Company registered successfully"
+                ) {
+                  setEmail(newEmail);
+                  setPassword("");
+                  setCompanySignupName("");
+                  setCompanySignupEmail("");
+                  setCompanySignupPassword("");
+                  setCompanySignupConfirmPassword("");
+                  setCompanySignupError("");
+                  setRegistrationMessage(
+                    "Company registration successful! Please login with your email and password."
+                  );
+                  setPage("dashboard");
+                } else {
+                  setCompanySignupError(
+                    data.detail ||
+                    data.message ||
+                    "Company registration failed"
+                  );
+                }
+              } catch (error) {
+                console.error("Company registration connection error:", error);
+                setCompanySignupError("Cannot connect to backend");
+              } finally {
+                setCompanySignupLoading(false);
+              }
+            }}
+          >
+            {companySignupLoading ? "Signing Up..." : "Sign Up"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setPage("dashboard");
+              setCompanySignupError("");
+              setCompanySignupName("");
+              setCompanySignupEmail("");
+              setCompanySignupPassword("");
+              setCompanySignupConfirmPassword("");
+            }}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#244394",
+              cursor: "pointer",
+              marginTop: "10px",
+              fontWeight: "bold",
+            }}
+          >
+            ← Back to Company Login
+          </button>
+
+          {companySignupError && (
+            <p
+              style={{
+                color: "red",
+                marginTop: "12px",
+                fontWeight: "bold",
+              }}
+            >
+              {companySignupError}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // =====================================================
   // FORGOT PASSWORD PAGE
   // =====================================================
 
@@ -2302,6 +2497,8 @@ function App() {
               setLoginError("");
               setRegistrationMessage("");
               setStudentId(null);
+              setCompanyId(null);
+              setCompanyName("");
             }}
           >
             Student
@@ -2323,6 +2520,8 @@ function App() {
               setLoginError("");
               setRegistrationMessage("");
               setStudentId(null);
+              setCompanyId(null);
+              setCompanyName("");
             }}
           >
             Company
@@ -2344,6 +2543,8 @@ function App() {
               setLoginError("");
               setRegistrationMessage("");
               setStudentId(null);
+              setCompanyId(null);
+              setCompanyName("");
             }}
           >
             Admin
@@ -2466,6 +2667,34 @@ function App() {
           </button>
         )}
 
+        {role === "company" && (
+          <button
+            type="button"
+            onClick={() => {
+              setPage("company-signup");
+              setLoginError("");
+              setRegistrationMessage("");
+              setCompanySignupError("");
+              setCompanySignupName("");
+              setCompanySignupEmail("");
+              setCompanySignupPassword("");
+              setCompanySignupConfirmPassword("");
+            }}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#244394",
+              cursor: "pointer",
+              marginTop: "10px",
+              marginBottom: "10px",
+              fontWeight: "bold",
+              fontSize: "15px"
+            }}
+          >
+            New Company? Sign Up
+          </button>
+        )}
+
         <button
           className="login-button"
           onClick={async () => {
@@ -2500,18 +2729,50 @@ function App() {
 
             // COMPANY LOGIN
             if (role === "company") {
-
-              if (
-                email.trim() === "company@gmail.com" &&
-                password === "company123"
-              ) {
-                setLoggedIn(true);
-                setPage("dashboard");
-                setLoginError("");
-              } else {
-                setLoginError(
-                  "Invalid company email or password"
+              try {
+                const response = await fetch(
+                  API_URL + "/companies/login",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Accept: "application/json",
+                    },
+                    body: JSON.stringify({
+                      email: email.trim(),
+                      password: password,
+                    }),
+                  }
                 );
+
+                let data = {};
+                try {
+                  data = await response.json();
+                } catch (error) {
+                  data = {};
+                }
+
+                if (
+                  response.ok &&
+                  data.message === "Company login successful" &&
+                  data.company_id
+                ) {
+                  setCompanyId(data.company_id);
+                  setCompanyName(data.company_name || "Company");
+                  setLoggedIn(true);
+                  setPage("dashboard");
+                  setLoginError("");
+                  setRegistrationMessage("");
+                } else {
+                  setLoginError(
+                    data.detail ||
+                    data.message ||
+                    "Invalid company email or password"
+                  );
+                }
+              } catch (error) {
+                console.error("Company login connection error:", error);
+                setLoginError("Cannot connect to backend");
               }
 
               return;
@@ -2579,7 +2840,7 @@ function App() {
           Login
         </button>
 
-        {registrationMessage && role === "student" && (
+        {registrationMessage && (
           <p
             style={{
               color: "green",
