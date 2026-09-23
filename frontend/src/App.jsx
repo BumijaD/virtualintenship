@@ -26,7 +26,14 @@ function App() {
 
   const [studentId, setStudentId] = useState(null);
   const [companyId, setCompanyId] = useState(null);
-  const [companyName, setCompanyName] = useState("");
+
+  // COMPANY SIGNUP
+  const [companySignupName, setCompanySignupName] = useState("");
+  const [companySignupEmail, setCompanySignupEmail] = useState("");
+  const [companySignupPassword, setCompanySignupPassword] = useState("");
+  const [companySignupConfirmPassword, setCompanySignupConfirmPassword] = useState("");
+  const [companySignupError, setCompanySignupError] = useState("");
+  const [companySignupLoading, setCompanySignupLoading] = useState(false);
 
   const [signupName, setSignupName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
@@ -35,14 +42,6 @@ function App() {
   const [signupError, setSignupError] = useState("");
   const [signupLoading, setSignupLoading] = useState(false);
   const [registrationMessage, setRegistrationMessage] = useState("");
-
-  // COMPANY ACCOUNT / SIGNUP
-  const [companySignupName, setCompanySignupName] = useState("");
-  const [companySignupEmail, setCompanySignupEmail] = useState("");
-  const [companySignupPassword, setCompanySignupPassword] = useState("");
-  const [companySignupConfirmPassword, setCompanySignupConfirmPassword] = useState("");
-  const [companySignupError, setCompanySignupError] = useState("");
-  const [companySignupLoading, setCompanySignupLoading] = useState(false);
 
   // =====================================================
   // LOGOUT
@@ -64,15 +63,14 @@ function App() {
     setSignupConfirmPassword("");
     setSignupError("");
     setSignupLoading(false);
+    setStudentId(null);
+    setCompanyId(null);
     setCompanySignupName("");
     setCompanySignupEmail("");
     setCompanySignupPassword("");
     setCompanySignupConfirmPassword("");
     setCompanySignupError("");
     setCompanySignupLoading(false);
-    setStudentId(null);
-    setCompanyId(null);
-    setCompanyName("");
     setApplicationMessage("");
     setCompanyApplicationMessage("");
     setSelectedInternship(null);
@@ -913,8 +911,13 @@ function App() {
               }
 
               try {
+                if (!companyId) {
+                  alert("Company ID is missing. Please login again.");
+                  return;
+                }
+
                 const query = new URLSearchParams({
-                  company_id: String(companyId || 1),
+                  company_id: String(companyId),
                   admin_id: "1",
                   title: String(title),
                   description: String(description),
@@ -1331,7 +1334,7 @@ function App() {
         <div className="dashboard-content">
 
           <h2>
-            Welcome, {companyName || "Company"} 🏢
+            Welcome, Company 🏢
           </h2>
 
           <p>
@@ -2188,12 +2191,12 @@ function App() {
             onClick={async () => {
               setCompanySignupError("");
 
-              const name = companySignupName.trim();
+              const companyName = companySignupName.trim();
               const newEmail = companySignupEmail.trim();
               const newPassword = companySignupPassword;
               const confirmPasswordValue = companySignupConfirmPassword;
 
-              if (!name || !newEmail || !newPassword || !confirmPasswordValue) {
+              if (!companyName || !newEmail || !newPassword || !confirmPasswordValue) {
                 setCompanySignupError("Please fill all fields");
                 return;
               }
@@ -2220,7 +2223,7 @@ function App() {
                       Accept: "application/json",
                     },
                     body: JSON.stringify({
-                      company_name: name,
+                      company_name: companyName,
                       email: newEmail,
                       password: newPassword,
                     }),
@@ -2228,6 +2231,7 @@ function App() {
                 );
 
                 let data = {};
+
                 try {
                   data = await response.json();
                 } catch (error) {
@@ -2237,7 +2241,10 @@ function App() {
                 if (
                   response.ok &&
                   data.company_id &&
-                  data.message === "Company registered successfully"
+                  (
+                    data.message === "Company registered successfully" ||
+                    data.message === "Registration successful"
+                  )
                 ) {
                   setEmail(newEmail);
                   setPassword("");
@@ -2246,9 +2253,8 @@ function App() {
                   setCompanySignupPassword("");
                   setCompanySignupConfirmPassword("");
                   setCompanySignupError("");
-                  setRegistrationMessage(
-                    "Company registration successful! Please login with your email and password."
-                  );
+                  setLoginError("");
+                  setRegistrationMessage("Company registration successful! Please login with your email and password.");
                   setPage("dashboard");
                 } else {
                   setCompanySignupError(
@@ -2471,9 +2477,25 @@ function App() {
   // =====================================================
 
   return (
-    <div className="app">
+    <div className="app login-page">
 
-      <div className="login-box">
+      <div className="login-shell">
+
+        <div className="login-visual">
+          <img
+            src="/internship-hero.svg"
+            alt="Students learning and building their careers"
+            className="internship-image"
+          />
+
+          <div className="visual-overlay">
+            <span className="visual-badge">INTERNSHIP • LEARN • GROW</span>
+            <h2>Build Your Career With Real-World Experience</h2>
+            <p>Discover internship opportunities, connect with companies, and take the next step toward your career.</p>
+          </div>
+        </div>
+
+        <div className="login-box login-form">
 
         <h1>
           Virtual Internship Platform
@@ -2497,8 +2519,6 @@ function App() {
               setLoginError("");
               setRegistrationMessage("");
               setStudentId(null);
-              setCompanyId(null);
-              setCompanyName("");
             }}
           >
             Student
@@ -2520,8 +2540,6 @@ function App() {
               setLoginError("");
               setRegistrationMessage("");
               setStudentId(null);
-              setCompanyId(null);
-              setCompanyName("");
             }}
           >
             Company
@@ -2543,8 +2561,6 @@ function App() {
               setLoginError("");
               setRegistrationMessage("");
               setStudentId(null);
-              setCompanyId(null);
-              setCompanyName("");
             }}
           >
             Admin
@@ -2674,21 +2690,21 @@ function App() {
               setPage("company-signup");
               setLoginError("");
               setRegistrationMessage("");
-              setCompanySignupError("");
               setCompanySignupName("");
               setCompanySignupEmail("");
               setCompanySignupPassword("");
               setCompanySignupConfirmPassword("");
+              setCompanySignupError("");
             }}
             style={{
               background: "none",
               border: "none",
               color: "#244394",
               cursor: "pointer",
-              marginTop: "10px",
-              marginBottom: "10px",
+              marginTop: "5px",
+              marginBottom: "15px",
               fontWeight: "bold",
-              fontSize: "15px"
+              fontSize: "15px",
             }}
           >
             New Company? Sign Up
@@ -2729,6 +2745,7 @@ function App() {
 
             // COMPANY LOGIN
             if (role === "company") {
+
               try {
                 const response = await fetch(
                   API_URL + "/companies/login",
@@ -2746,19 +2763,20 @@ function App() {
                 );
 
                 let data = {};
+
                 try {
                   data = await response.json();
                 } catch (error) {
                   data = {};
                 }
 
-                if (
-                  response.ok &&
-                  data.message === "Company login successful" &&
-                  data.company_id
-                ) {
+                console.log("Company login response:", data);
+
+                // The backend may return either "Login successful"
+                // or "Company login successful".
+                // A successful HTTP response with a company_id means login succeeded.
+                if (response.ok && data.company_id) {
                   setCompanyId(data.company_id);
-                  setCompanyName(data.company_name || "Company");
                   setLoggedIn(true);
                   setPage("dashboard");
                   setLoginError("");
@@ -2840,7 +2858,7 @@ function App() {
           Login
         </button>
 
-        {registrationMessage && (
+        {registrationMessage && role === "student" && (
           <p
             style={{
               color: "green",
@@ -2864,6 +2882,7 @@ function App() {
           </p>
         )}
 
+      </div>
       </div>
     </div>
   );

@@ -700,7 +700,59 @@ main > h1 {
 .edit-profile-button:hover {
   background: #1d4ed8;
 }
-/* FINAL LOGIN CENTERING */
+/* Center the login page */
+.app {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* Keep login card centered */
+.login-box {
+  margin: 0 auto;
+}
+/* ================================
+   CENTER LOGIN PAGE
+   ================================ */
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app {
+  width: 100%;
+  min-height: 100vh;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto !important;
+  box-sizing: border-box;
+}
+/* CENTER LOGIN PAGE */
 
 html,
 body,
@@ -722,22 +774,232 @@ body {
 .app {
   width: 100% !important;
   min-height: 100vh !important;
-
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
-
   margin: 0 !important;
   padding: 20px !important;
-
   box-sizing: border-box !important;
 }
 
 .login-box {
-  width: 580px !important;
-  max-width: calc(100vw - 40px) !important;
-
+  width: 100% !important;
+  max-width: 600px !important;
   margin: 0 auto !important;
-
   box-sizing: border-box !important;
+}
+
+/* =====================================================
+   MODERN INTERNSHIP LOGIN PAGE
+   ===================================================== */
+
+.login-page {
+  min-height: 100vh;
+  padding: 24px;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #eef4ff 0%, #f8f5ff 100%);
+}
+
+.login-shell {
+  width: min(1180px, 100%);
+  min-height: 700px;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  background: #ffffff;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 24px 70px rgba(31, 41, 55, 0.16);
+}
+
+.login-visual {
+  position: relative;
+  min-height: 700px;
+  overflow: hidden;
+  background: linear-gradient(145deg, #315eea, #6b4bc4);
+}
+
+.internship-image {
+  width: 100%;
+  height: 100%;
+  min-height: 700px;
+  display: block;
+  object-fit: cover;
+}
+
+.visual-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 42px;
+  color: white;
+  background: linear-gradient(
+    to top,
+    rgba(16, 24, 64, 0.86),
+    rgba(16, 24, 64, 0.48),
+    transparent
+  );
+}
+
+.visual-badge {
+  display: inline-block;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.visual-overlay h2 {
+  max-width: 520px;
+  margin: 16px 0 10px;
+  color: white;
+  font-size: 34px;
+  line-height: 1.15;
+}
+
+.visual-overlay p {
+  max-width: 520px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.login-form {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 700px;
+  margin: 0 !important;
+  padding: 55px 58px !important;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #ffffff;
+}
+
+.login-form h1 {
+  margin: 0 0 12px;
+  color: #173f92;
+  font-size: 34px;
+  line-height: 1.15;
+}
+
+.login-form h2 {
+  margin: 22px 0;
+  color: #1e293b;
+}
+
+.login-form input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 14px 15px;
+  font-size: 15px;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-form input:focus {
+  border-color: #315eea;
+  box-shadow: 0 0 0 3px rgba(49, 94, 234, 0.12);
+}
+
+.login-form .role-buttons {
+  margin-bottom: 4px;
+}
+
+.login-form .login-button {
+  width: 100%;
+  margin-top: 8px;
+  border-radius: 10px;
+  min-height: 48px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+@media (max-width: 850px) {
+  .login-page {
+    padding: 14px;
+    align-items: flex-start !important;
+  }
+
+  .login-shell {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    border-radius: 22px;
+  }
+
+  .login-visual {
+    min-height: 300px;
+    height: 300px;
+  }
+
+  .internship-image {
+    min-height: 300px;
+  }
+
+  .visual-overlay {
+    padding: 24px;
+  }
+
+  .visual-overlay h2 {
+    font-size: 25px;
+  }
+
+  .visual-overlay p {
+    font-size: 14px;
+  }
+
+  .login-form {
+    min-height: auto;
+    padding: 35px 25px !important;
+  }
+
+  .login-form h1 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 520px) {
+  .login-page {
+    padding: 0;
+  }
+
+  .login-shell {
+    width: 100%;
+    border-radius: 0;
+    min-height: 100vh;
+  }
+
+  .login-visual {
+    height: 250px;
+    min-height: 250px;
+  }
+
+  .internship-image {
+    min-height: 250px;
+  }
+
+  .visual-overlay {
+    padding: 20px;
+  }
+
+  .visual-overlay h2 {
+    margin-top: 10px;
+    font-size: 22px;
+  }
+
+  .visual-overlay p {
+    display: none;
+  }
+
+  .login-form {
+    padding: 30px 20px !important;
+  }
 }
