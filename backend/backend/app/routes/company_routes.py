@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
@@ -9,8 +10,78 @@ router = APIRouter()
 
 
 # =====================================================
+# COMPANY SIGNUP REQUEST
+# =====================================================
+
+class CompanyRegister(BaseModel):
+    company_name: str
+    email: str
+    password: str
+
+
+# =====================================================
+# COMPANY LOGIN REQUEST
+# =====================================================
+
+class CompanyLogin(BaseModel):
+    email: str
+    password: str
+
+
+# =====================================================
+# COMPANY REGISTER / SIGN UP
+# =====================================================
+
+@router.post("/companies/register")
+def company_register(
+    register_data: CompanyRegister,
+    db: Session = Depends(get_db)
+):
+    # Check whether email already exists
+    existing_company = (
+        db.query(Company)
+        .filter(Company.email == register_data.email)
+        .first()
+    )
+
+    if existing_company:
+        return {
+            "message": "Email already registered"
+        }
+
+    # Create new company
+    company = Company(
+        company_name=register_data.company_name,
+        email=register_data.email,
+        password=register_data.password,
+        phone="",
+        company_address=""
+    )
+
+    try:
+        db.add(company)
+        db.commit()
+        db.refresh(company)
+
+        return {
+            "message": "Company registered successfully",
+            "company_id": company.company_id,
+            "company_name": company.company_name,
+            "email": company.email
+        }
+
+    except IntegrityError:
+        db.rollback()
+
+        return {
+            "message": "Email already registered"
+        }
+
+
+# =====================================================
 # CREATE COMPANY
 # =====================================================
+# This keeps your existing API working.
 
 @router.post("/companies")
 def create_company(
@@ -21,9 +92,11 @@ def create_company(
     company_address: str,
     db: Session = Depends(get_db)
 ):
-    existing_company = db.query(Company).filter(
-        Company.email == email
-    ).first()
+    existing_company = (
+        db.query(Company)
+        .filter(Company.email == email)
+        .first()
+    )
 
     if existing_company:
         return {
@@ -62,16 +135,23 @@ def create_company(
 
 @router.post("/companies/login")
 def company_login(
-    email: str,
-    password: str,
+    login_data: CompanyLogin,
     db: Session = Depends(get_db)
 ):
-    company = db.query(Company).filter(
-        Company.email == email,
-        Company.password == password
-    ).first()
+    company = (
+        db.query(Company)
+        .filter(
+            Company.email == login_data.email
+        )
+        .first()
+    )
 
     if company is None:
+        return {
+            "message": "Invalid email or password"
+        }
+
+    if company.password != login_data.password:
         return {
             "message": "Invalid email or password"
         }
@@ -79,7 +159,8 @@ def company_login(
     return {
         "message": "Company login successful",
         "company_id": company.company_id,
-        "company_name": company.company_name
+        "company_name": company.company_name,
+        "email": company.email
     }
 
 
@@ -92,9 +173,11 @@ def get_company(
     company_id: int,
     db: Session = Depends(get_db)
 ):
-    company = db.query(Company).filter(
-        Company.company_id == company_id
-    ).first()
+    company = (
+        db.query(Company)
+        .filter(Company.company_id == company_id)
+        .first()
+    )
 
     if company is None:
         return {
@@ -124,9 +207,11 @@ def update_company(
     company_address: str,
     db: Session = Depends(get_db)
 ):
-    company = db.query(Company).filter(
-        Company.company_id == company_id
-    ).first()
+    company = (
+        db.query(Company)
+        .filter(Company.company_id == company_id)
+        .first()
+    )
 
     if company is None:
         return {
@@ -157,9 +242,11 @@ def delete_company(
     company_id: int,
     db: Session = Depends(get_db)
 ):
-    company = db.query(Company).filter(
-        Company.company_id == company_id
-    ).first()
+    company = (
+        db.query(Company)
+        .filter(Company.company_id == company_id)
+        .first()
+    )
 
     if company is None:
         return {
@@ -184,9 +271,11 @@ def company_forgot_password(
     new_password: str,
     db: Session = Depends(get_db)
 ):
-    company = db.query(Company).filter(
-        Company.email == email
-    ).first()
+    company = (
+        db.query(Company)
+        .filter(Company.email == email)
+        .first()
+    )
 
     if company is None:
         return {
