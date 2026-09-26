@@ -6,11 +6,12 @@ from sqlalchemy.exc import IntegrityError
 from ..database import get_db
 from ..models.student import Student
 
+
 router = APIRouter()
 
 
 # =====================================================
-# STUDENT LOGIN REQUEST
+# STUDENT LOGIN
 # =====================================================
 
 class StudentLogin(BaseModel):
@@ -19,22 +20,44 @@ class StudentLogin(BaseModel):
 
 
 # =====================================================
-# STUDENT REGISTER REQUEST
+# STUDENT REGISTER
 # =====================================================
 
 class StudentRegister(BaseModel):
     name: str
     email: str
     password: str
+    phone:str
+    college:str
+    department:str
+    year_of_study:str
+    skills:str
+    cgpa:str
+    resume:str
 
 
 # =====================================================
-# STUDENT FORGOT PASSWORD REQUEST
+# FORGOT PASSWORD
 # =====================================================
 
 class StudentForgotPassword(BaseModel):
     email: str
     new_password: str
+
+
+# =====================================================
+# STUDENT PROFILE UPDATE
+# =====================================================
+
+class StudentProfileUpdate(BaseModel):
+    name: str
+    phone: str
+    college: str
+    department: str
+    year_of_study: str
+    cgpa: float
+    skills: str
+    resume: str
 
 
 # =====================================================
@@ -51,6 +74,7 @@ def create_student(
     cgpa: float,
     db: Session = Depends(get_db)
 ):
+
     existing_student = (
         db.query(Student)
         .filter(Student.email == email)
@@ -68,10 +92,15 @@ def create_student(
         password=password,
         phone=phone,
         department=department,
-        cgpa=cgpa
+        cgpa=cgpa,
+        college="",
+        year_of_study="",
+        skills="",
+        resume=""
     )
 
     try:
+
         db.add(student)
         db.commit()
         db.refresh(student)
@@ -82,6 +111,7 @@ def create_student(
         }
 
     except IntegrityError:
+
         db.rollback()
 
         return {
@@ -98,6 +128,7 @@ def student_register(
     register_data: StudentRegister,
     db: Session = Depends(get_db)
 ):
+
     existing_student = (
         db.query(Student)
         .filter(Student.email == register_data.email)
@@ -113,12 +144,17 @@ def student_register(
         name=register_data.name,
         email=register_data.email,
         password=register_data.password,
-        phone="",
-        department="",
-        cgpa=0
+        phone=register_data.phone,
+        college=register_data.college,
+        department=register_data.department,
+        year_of_study=register_data.year_of_study,
+        skills=register_data.skills,
+        resume=register_data.resume,
+        cgpa=register_data.cgpa
     )
 
     try:
+
         db.add(student)
         db.commit()
         db.refresh(student)
@@ -131,6 +167,7 @@ def student_register(
         }
 
     except IntegrityError:
+
         db.rollback()
 
         return {
@@ -147,6 +184,7 @@ def student_login(
     login_data: StudentLogin,
     db: Session = Depends(get_db)
 ):
+
     student = (
         db.query(Student)
         .filter(Student.email == login_data.email)
@@ -154,11 +192,13 @@ def student_login(
     )
 
     if student is None:
+
         return {
             "message": "Invalid email or password"
         }
 
     if student.password != login_data.password:
+
         return {
             "message": "Invalid email or password"
         }
@@ -172,7 +212,7 @@ def student_login(
 
 
 # =====================================================
-# STUDENT FORGOT PASSWORD
+# FORGOT PASSWORD
 # =====================================================
 
 @router.post("/students/forgot-password")
@@ -180,6 +220,7 @@ def student_forgot_password(
     forgot_data: StudentForgotPassword,
     db: Session = Depends(get_db)
 ):
+
     student = (
         db.query(Student)
         .filter(Student.email == forgot_data.email)
@@ -187,6 +228,7 @@ def student_forgot_password(
     )
 
     if student is None:
+
         return {
             "message": "Email not found"
         }
@@ -194,6 +236,7 @@ def student_forgot_password(
     student.password = forgot_data.new_password
 
     db.commit()
+
     db.refresh(student)
 
     return {
@@ -202,7 +245,7 @@ def student_forgot_password(
 
 
 # =====================================================
-# GET STUDENT
+# GET STUDENT PROFILE
 # =====================================================
 
 @router.get("/students/{student_id}")
@@ -210,6 +253,7 @@ def get_student(
     student_id: int,
     db: Session = Depends(get_db)
 ):
+
     student = (
         db.query(Student)
         .filter(Student.student_id == student_id)
@@ -217,6 +261,7 @@ def get_student(
     )
 
     if student is None:
+
         return {
             "message": "Student not found"
         }
@@ -225,14 +270,88 @@ def get_student(
         "student_id": student.student_id,
         "name": student.name,
         "email": student.email,
-        "phone": student.phone,
-        "department": student.department,
-        "cgpa": float(student.cgpa)
+        "phone": student.phone or "",
+        "college": student.college or "",
+        "department": student.department or "",
+        "year_of_study": student.year_of_study or "",
+        "cgpa": float(student.cgpa) if student.cgpa is not None else 0,
+        "skills": student.skills or "",
+        "resume": student.resume or ""
     }
 
 
 # =====================================================
-# UPDATE STUDENT
+# UPDATE STUDENT PROFILE
+# =====================================================
+
+@router.put("/students/{student_id}/profile")
+def update_student_profile(
+    student_id: int,
+    profile_data: StudentProfileUpdate,
+    db: Session = Depends(get_db)
+):
+
+    student = (
+        db.query(Student)
+        .filter(Student.student_id == student_id)
+        .first()
+    )
+
+    if student is None:
+
+        return {
+            "message": "Student not found"
+        }
+
+    student.name = profile_data.name
+
+    student.phone = profile_data.phone
+
+    student.college = profile_data.college
+
+    student.department = profile_data.department
+
+    student.year_of_study = profile_data.year_of_study
+
+    student.cgpa = profile_data.cgpa
+
+    student.skills = profile_data.skills
+
+    student.resume = profile_data.resume
+
+    db.commit()
+
+    db.refresh(student)
+
+    return {
+        "message": "Student profile updated successfully",
+
+        "student_id": student.student_id,
+
+        "name": student.name,
+
+        "email": student.email,
+
+        "phone": student.phone,
+
+        "college": student.college,
+
+        "department": student.department,
+
+        "year_of_study": student.year_of_study,
+
+        "cgpa": float(student.cgpa)
+        if student.cgpa is not None
+        else 0,
+
+        "skills": student.skills,
+
+        "resume": student.resume
+    }
+
+
+# =====================================================
+# OLD UPDATE STUDENT
 # =====================================================
 
 @router.put("/students/{student_id}")
@@ -244,6 +363,7 @@ def update_student(
     cgpa: float,
     db: Session = Depends(get_db)
 ):
+
     student = (
         db.query(Student)
         .filter(Student.student_id == student_id)
@@ -251,16 +371,21 @@ def update_student(
     )
 
     if student is None:
+
         return {
             "message": "Student not found"
         }
 
     student.name = name
+
     student.phone = phone
+
     student.department = department
+
     student.cgpa = cgpa
 
     db.commit()
+
     db.refresh(student)
 
     return {
@@ -278,6 +403,7 @@ def delete_student(
     student_id: int,
     db: Session = Depends(get_db)
 ):
+
     student = (
         db.query(Student)
         .filter(Student.student_id == student_id)
@@ -285,11 +411,13 @@ def delete_student(
     )
 
     if student is None:
+
         return {
             "message": "Student not found"
         }
 
     db.delete(student)
+
     db.commit()
 
     return {

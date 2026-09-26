@@ -25,7 +25,65 @@ function App() {
   // =====================================================
 
   const [studentId, setStudentId] = useState(null);
-  const [companyId, setCompanyId] = useState(null);
+  const [studentProfile, setStudentProfile] = useState({
+  name: "",
+  email: "",
+  phone: "",
+  college: "",
+  department: "",
+  year_of_study: "",
+  cgpa: "",
+  skills: "",
+  resume: ""
+});
+
+const [profileLoading, setProfileLoading] = useState(false);
+const [profileError, setProfileError] = useState("");
+const [profileMessage, setProfileMessage] = useState("");
+const [editingProfile, setEditingProfile] = useState(false);
+
+useEffect(() => {
+  const loadStudentProfile = async () => {
+    if (!studentId) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        API_URL + "/students/" + studentId
+      );
+
+      if (!response.ok) {
+        console.error("Failed to load student profile");
+        return;
+      }
+
+      const data = await response.json();
+
+      setStudentProfile({
+        name: data.name || "",
+        email: data.email || "",
+        phone: data.phone || "",
+        college: data.college || "",
+        department: data.department || "",
+        year_of_study: data.year_of_study || "",
+        cgpa: data.cgpa || "",
+        skills: data.skills || "",
+        resume: data.resume || ""
+      });
+
+    } catch (error) {
+      console.error(
+        "Student profile loading error:",
+        error
+      );
+    }
+  };
+
+  loadStudentProfile();
+}, [studentId]);
+
+const [companyId, setCompanyId] = useState(null);
 
   // COMPANY SIGNUP
   const [companySignupName, setCompanySignupName] = useState("");
@@ -39,6 +97,13 @@ function App() {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
+  const [signupPhone, setSignupPhone] = useState("");
+  const [signupCollege, setSignupCollege] = useState("");
+  const [signupDepartment, setSignupDepartment] = useState("");
+  const [signupYear, setSignupYear] = useState("");
+  const [signupSkills, setSignupSkills] = useState("");
+  const [signupCgpa, setSignupCgpa] = useState("");
+  const [signupResume, setSignupResume] = useState("");
   const [signupError, setSignupError] = useState("");
   const [signupLoading, setSignupLoading] = useState(false);
   const [registrationMessage, setRegistrationMessage] = useState("");
@@ -1445,7 +1510,7 @@ function App() {
               👤
             </div>
 
-            <h3>Bumija</h3>
+            <h3>{studentProfile.name || "Student"}</h3>
 
             <p className="profile-role">
               Student
@@ -1456,40 +1521,44 @@ function App() {
               <div className="profile-item">
                 <strong>Email</strong>
                 <span>
-                  dharmatest20260812@gmail.com
+                  {studentProfile.email || "Not provided"}
                 </span>
               </div>
 
               <div className="profile-item">
                 <strong>Phone</strong>
-                <span>9876543210</span>
+                <span>{studentProfile.phone || "Not provided"}</span>
               </div>
 
               <div className="profile-item">
                 <strong>College</strong>
-                <span>Engineering College</span>
+                <span>{studentProfile.college || "Not provided"}</span>
               </div>
 
               <div className="profile-item">
                 <strong>Department</strong>
-                <span>Cybersecurity</span>
+                <span>{studentProfile.department || "Not provided"}</span>
               </div>
 
               <div className="profile-item">
                 <strong>Year</strong>
-                <span>2nd Year</span>
+                <span>{studentProfile.year_of_study || "Not provided"}</span>
               </div>
 
               <div className="profile-item">
                 <strong>Skills</strong>
                 <span>
-                  Python, Java, React, SQL
+                  {studentProfile.skills || "Not provided"}
                 </span>
+              </div>
+              <div className="profile-item">
+                 <strong>CGPA</strong>
+                 <span>{studentProfile.cgpa || "Not provided"}</span>
               </div>
 
               <div className="profile-item">
                 <strong>Resume</strong>
-                <span>Resume.pdf</span>
+                <span>{studentProfile.resume || "Not provided"}</span>
               </div>
 
             </div>
@@ -1979,6 +2048,69 @@ function App() {
               setSignupError("");
             }}
           />
+          <input
+            type="text"
+            placeholder="Enter Phone Number"
+            value={signupPhone}
+            onChange={(e) => {
+              setSignupPhone(e.target.value);
+              setSignupError("");
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Enter College Name"
+            value={signupCollege}
+            onChange={(e) => {
+             setSignupCollege(e.target.value);
+             setSignupError("");
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Enter Department / Course"
+            value={signupDepartment}
+            onChange={(e) => {
+             setSignupDepartment(e.target.value);
+             setSignupError("");
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Enter Year of Study"
+            value={signupYear}
+            onChange={(e) => {
+             setSignupYear(e.target.value);
+             setSignupError("");
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Enter Skills"
+            value={signupSkills}
+            onChange={(e) => {
+             setSignupSkills(e.target.value);
+             setSignupError("");
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Enter CGPA"
+            value={signupCgpa}
+            onChange={(e) => {
+             setSignupCgpa(e.target.value);
+             setSignupError("");
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Enter Resume File Name"
+            value={signupResume}
+            onChange={(e) => {
+             setSignupResume(e.target.value);
+             setSignupError("");
+            }}
+          />
 
           <input
             type="password"
@@ -1989,6 +2121,7 @@ function App() {
               setSignupError("");
             }}
           />
+
 
           <input
             type="password"
@@ -2026,7 +2159,7 @@ function App() {
                 setSignupError("Passwords do not match");
                 return;
               }
-
+ 
               setSignupLoading(true);
 
               try {
@@ -2042,6 +2175,13 @@ function App() {
                       name: name,
                       email: newEmail,
                       password: newPassword,
+                      phone: signupPhone,
+                      college: signupCollege,
+                      department: signupDepartment,
+                      year_of_study: signupYear,
+                      skills: signupSkills,
+                      cgpa: signupCgpa,
+                      resume: signupResume,
                     }),
                   }
                 );
