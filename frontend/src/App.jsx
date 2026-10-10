@@ -41,7 +41,65 @@ const [profileLoading, setProfileLoading] = useState(false);
 const [profileError, setProfileError] = useState("");
 const [profileMessage, setProfileMessage] = useState("");
 const [editingProfile, setEditingProfile] = useState(false);
+const saveStudentProfile = async () => {
+  if (!studentId) {
+    return;
+  }
 
+  try {
+    setProfileLoading(true);
+    setProfileError("");
+    setProfileMessage("");
+
+    const response = await fetch(
+      API_URL + "/students/" + studentId + "/profile",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(studentProfile)
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setProfileError(
+        data.detail ||
+        data.message ||
+        "Failed to update profile"
+      );
+      return;
+    }
+
+    setStudentProfile({
+      name: data.name || "",
+      email: data.email || "",
+      phone: data.phone || "",
+      college: data.college || "",
+      department: data.department || "",
+      year_of_study: data.year_of_study || "",
+      cgpa: data.cgpa || "",
+      skills: data.skills || "",
+      resume: data.resume || ""
+    });
+
+    setProfileMessage("Profile updated successfully");
+    setEditingProfile(false);
+
+  } catch (error) {
+    console.error(
+      "Student profile update error:",
+      error
+    );
+
+    setProfileError("Cannot connect to backend");
+
+  } finally {
+    setProfileLoading(false);
+  }
+};
 useEffect(() => {
   const loadStudentProfile = async () => {
     if (!studentId) {
@@ -1565,18 +1623,109 @@ const [companyId, setCompanyId] = useState(null);
 
             <button
               className="edit-profile-button"
-              onClick={() =>
-                alert(
-                  "Edit Profile feature will be added next."
-                )
-              }
+              onClick={() => setEditingProfile(true)}
             >
+      
               Edit Profile
             </button>
 
+            {editingProfile && (
+              <div className="profile-edit-form">
+
+                <h3>Edit Profile</h3>
+
+                <input
+                  type="text"
+                  placeholder="Phone"
+                  value={studentProfile.phone}
+                  onChange={(e) =>
+                    setStudentProfile({
+                      ...studentProfile,
+                      phone: e.target.value
+                    })
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="College"
+                  value={studentProfile.college}
+                  onChange={(e) =>
+                   setStudentProfile({
+                    ...studentProfile,
+                    college: e.target.value
+                    })
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="Department"
+                  value={studentProfile.department}
+                  onChange={(e) =>
+                   setStudentProfile({
+                    ...studentProfile,
+                    department: e.target.value
+                   })
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="Year of Study"
+                  value={studentProfile.year_of_study}
+                  onChange={(e) =>
+                    setStudentProfile({
+                    ...studentProfile,
+                    year_of_study: e.target.value
+                    })
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="Skills"
+                  value={studentProfile.skills}
+                  onChange={(e) =>
+                   setStudentProfile({
+                   ...studentProfile,
+                   skills: e.target.value
+                   })
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="CGPA"
+                  value={studentProfile.cgpa}
+                  onChange={(e) =>
+                    setStudentProfile({
+                    ...studentProfile,
+                    cgpa: e.target.value
+                    })
+                  }
+                />
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) =>{
+                    const file=e.target.files[0];
+                    if (file){
+                      setStudentProfile({
+                         ...studentProfile,
+                         resume: file.name
+                    });
+                  }
+                  }}
+                />
+                <button
+                  className="edit-profile-button"
+                  onClick={saveStudentProfile}
+                >
+                  Save Changes
+                </button>
+
+              </div>
+            )}
+
+            </div>
           </div>
         </div>
-      </div>
     );
   }
 
@@ -1920,10 +2069,40 @@ const [companyId, setCompanyId] = useState(null);
 
   if (
     loggedIn &&
-    role === "student"
+    role === "student"&&
+    page ==="dashboard"
   ) {
     return (
-      <div className="dashboard">
+      <div className="dashboard student-dashboard-layout">
+        <aside className="student-sidebar">
+
+  <h2>InternHub</h2>
+
+  <button onClick={() => setPage("dashboard")}>
+    🏠 Dashboard
+  </button>
+
+  <button onClick={() => setPage("internships")}>
+    💼 Find Internships
+  </button>
+
+  <button onClick={() => setPage("applications")}>
+    📋 My Applications
+  </button>
+
+  <button onClick={() => setPage("completed-internships")}>
+    🎓 Completed Internships
+  </button>
+
+  <button onClick={() => setPage("badges")}>
+    🏆 Certificates & Badges
+  </button>
+
+  <button onClick={() => setPage("profile")}>
+    👤 My Profile
+  </button>
+
+</aside>
 
         <header className="dashboard-header">
 
@@ -2103,12 +2282,15 @@ const [companyId, setCompanyId] = useState(null);
             }}
           />
           <input
-            type="text"
-            placeholder="Enter Resume File Name"
-            value={signupResume}
+            type="file"
+            accept=".pdf,.doc,.docx"
             onChange={(e) => {
+             const file = e.target.files[0];
+
+             if (file) {
              setSignupResume(e.target.value);
              setSignupError("");
+             }
             }}
           />
 
