@@ -2195,6 +2195,64 @@ const [companyId, setCompanyId] = useState(null);
       </div>
     );
   }
+  
+  // =====================================================
+  // STUDENT COMPLETED INTERNSHIPS
+  // =====================================================
+
+  if (
+    loggedIn &&
+    role === "student" &&
+    page === "completed-internships"
+  ) {
+    return (
+      <div className="dashboard">
+        <header className="dashboard-header">
+          <h1>Virtual Internship Platform</h1>
+          <button onClick={logout}>Logout</button>
+        </header>
+
+        <div className="dashboard-content">
+          <button onClick={() => setPage("dashboard")}>
+            ← Back to Dashboard
+          </button>
+
+          <h2>Completed Internships</h2>
+          <p>Your completed internships will appear here.</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // =====================================================
+  // STUDENT CERTIFICATES AND BADGES
+  // =====================================================
+
+  if (
+    loggedIn &&
+    role === "student" &&
+    page === "badges"
+  ) {
+    return (
+      <div className="dashboard">
+        <header className="dashboard-header">
+          <h1>Virtual Internship Platform</h1>
+          <button onClick={logout}>Logout</button>
+        </header>
+
+        <div className="dashboard-content">
+          <button onClick={() => setPage("dashboard")}>
+            ← Back to Dashboard
+          </button>
+
+          <h2>Certificates & Badges</h2>
+          <p>Your earned certificates and badges will appear here.</p>
+        </div>
+      </div>
+    );
+  }
+
+
 
   // =====================================================
   // STUDENT SIGNUP PAGE
